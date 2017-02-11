@@ -1,12 +1,12 @@
 import requests
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 
 def scrape_page(url):
     print 'scraping [{}]'.format(url)
     page = requests.get(url)
-    soup = BeautifulSoup(page.content)
-    print soup.prettify()
+    soup = BeautifulSoup(page.content, 'html.parser')
+    print soup.select('title')
 
 BULBAPEDIA_EGG_GROUPS_URL = 'http://bulbapedia.bulbagarden.net/wiki/Egg_Group'
 
