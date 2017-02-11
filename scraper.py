@@ -5,6 +5,20 @@ from bs4 import BeautifulSoup
 BULBAPEDIA_DOMAIN = 'http://bulbapedia.bulbagarden.net'
 
 
+class Pokemon(object):
+    def __init__(self, name, path):
+        self.name = name
+        self.path = path
+
+        self.egg_groups = []
+        self.gender_ratio = 0.5
+        self.hatch_time_min = 0
+        self.hatch_time_max = 0
+
+    def __str__(self):
+        return '{}: {}'.format(self.name, self.path)
+
+
 class EggGroup(object):
     def __init__(self, name, path):
         self.name = name
