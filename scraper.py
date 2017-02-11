@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 
-egg_groups = {}
 
 BULBAPEDIA_DOMAIN = 'http://bulbapedia.bulbagarden.net'
 
@@ -16,14 +15,15 @@ class EggGroup(object):
 
 
 def get_from_bulbapedia(path):
+    print 'scraping [{}]'.format(path)
     return requests.get(BULBAPEDIA_DOMAIN + path).content
 
 
-def scrape_page(url):
-    print 'scraping [{}]'.format(url)
+def get_egg_groups(url):
+    egg_groups = {}
+
     page = get_from_bulbapedia(url)
     soup = BeautifulSoup(page, 'html.parser')
-    print soup.select('title')
 
     egg_group_links = soup.select('table')[0].select('a')
 
@@ -32,10 +32,13 @@ def scrape_page(url):
         link = link.get('href')
         egg_group = EggGroup(name, link)
         egg_groups[name] = egg_group
-        print egg_group
+
+    return egg_groups
 
 
 BULBAPEDIA_EGG_GROUPS_URL = '/wiki/Egg_Group'
 
 if __name__ == '__main__':
-    scrape_page(BULBAPEDIA_EGG_GROUPS_URL)
+    egg_groups = get_egg_groups(BULBAPEDIA_EGG_GROUPS_URL)
+    for egg_group in egg_groups:
+        print egg_groups[egg_group]
