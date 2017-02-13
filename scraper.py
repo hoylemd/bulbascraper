@@ -10,29 +10,37 @@ def get_from_bulbapedia(path):
     return BeautifulSoup(page, 'html.parser')
 
 
-class Pokemon(object):
+class Parsable(object):
     def __init__(self, name, path):
         self.name = name
         self.path = path
+
+    def parse(self):
+        return get_from_bulbapedia(self.path)
+
+    def __unicode__(self):
+        return u"{}: {}".format(self.name, self.path)
+
+
+class Pokemon(Parsable):
+    def __init__(self, name, path):
+        super(Pokemon, self).__init__(name, path)
 
         self.egg_groups = []
         self.gender_ratio = 0.5
         self.hatch_time_min = 0
         self.hatch_time_max = 0
 
-    def __unicode__(self):
-        return u"{}: {}".format(self.name, self.path)
 
-
-class EggGroup(object):
+class EggGroup(Parsable):
     def __init__(self, name, path):
-        self.name = name
-        self.path = path
+        super(EggGroup, self).__init__(name, path)
 
         self.pokemon = {}
 
     def parse(self):
-        soup = get_from_bulbapedia(self.path)
+        soup = super(EggGroup, self).parse()
+
         pokemon_tables = soup.select('table.roundy table')
 
         for pokemon_row in pokemon_tables[0].select('tr')[1:]:
@@ -43,9 +51,6 @@ class EggGroup(object):
             pokemon.egg_groups.append(self)
             self.pokemon[name] = pokemon
             print u"{}".format(pokemon)
-
-    def __unicode__(self):
-        return u"{}: {}".format(self.name, self.path)
 
 
 def get_egg_groups(url):
