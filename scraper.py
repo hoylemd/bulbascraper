@@ -31,17 +31,53 @@ class Pokemon(Parsable):
     def __init__(self, name, path):
         super(Pokemon, self).__init__(name, path)
 
+        self.header_section = None
+        self.type_section = None
+        self.ability_section = None
+        self.gender_catch_section = None
+        self.breeding_section = None
+        self.physiology_section = None
+        self.mega_section = None
+        self.pokedex_section = None
+        self.exp_section = None
+        self.ev_yield_section = None
+        self.appearance_section = None
+        self.colour_and_friendship_section = None
+        self.links_section = None
+
         self.egg_groups = []
         self.gender_ratio = 0.5
         self.hatch_time_min = 0
         self.hatch_time_max = 0
+
+    def parse_breeding(self):
+        cells = self.breeding_section.table.tr.find_all('td', recursive=False)
+        egg_group_cell = cells[0]
+        hatch_time_cell = cells[1]
+        import ipdb; ipdb.set_trace()
 
     def parse(self):
         soup = super(Pokemon, self).parse()
 
         content = soup.find(id='mw-content-text')
         sidebar = content.find_all('table', recursive=False)[1]
-        import ipdb; ipdb.set_trace()
+        sections = sidebar.find_all('tr', recursive=False)
+
+        self.header_section = sections[0]
+        self.type_section = sections[1]
+        self.ability_section = sections[2]
+        self.gender_catch_section = sections[3]
+        self.breeding_section = sections[4]
+        self.physiology_section = sections[5]
+        self.mega_section = sections[6]
+        self.pokedex_section = sections[7]
+        self.exp_section = sections[8]
+        self.ev_yield_section = sections[9]
+        self.appearance_section = sections[10]
+        self.colour_and_friendship_section = sections[11]
+        self.links_section = sections[12]
+
+        self.parse_breeding()
 
 
 class EggGroup(Parsable):
@@ -78,6 +114,11 @@ def get_egg_groups(url):
 
     for link in egg_group_links:
         name = link.select('span')[0].string
+
+        # TODO: remove this
+        if not name == u'Bug':
+            continue
+
         link = link.get('href')
         egg_group = EggGroup(name, link)
         egg_groups[name] = egg_group
