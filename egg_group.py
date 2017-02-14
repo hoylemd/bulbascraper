@@ -25,9 +25,8 @@ class EggGroup(Parsable):
             pokemon.egg_groups.append(self)
             self.pokemon[slugify(name)] = pokemon
 
-    def parse_pokemon(self):
-        # for mon in self.pokemon:
-        mons = ['nincada', 'metapod']
+    def parse_pokemon(self, specifics=None):
+        mons = specifics or self.pokemon
         for mon in mons:
             pokemon = self.pokemon[mon]
             pokemon.parse()

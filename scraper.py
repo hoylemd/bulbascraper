@@ -11,9 +11,7 @@ if __name__ == '__main__':
 
     pokedex = Pokedex(source=bulbapedia)
 
-    egg_groups = pokedex.get_egg_groups()
-    for name in egg_groups:
-        group = egg_groups[name]
-        group.parse()
+    pokedex.get_egg_groups()
+    pokedex.parse_egg_groups(specifics=['bug'])
 
-    egg_groups[u'bug'].parse_pokemon()
+    pokedex.egg_groups[u'bug'].parse_pokemon(specifics=['nincada', 'metapod'])

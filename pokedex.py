@@ -21,10 +21,6 @@ class Pokedex(object):
         for link in egg_group_links:
             name = link.select('span')[0].string
 
-            # TODO: remove this
-            if not name == u'Bug':
-                continue
-
             link = link.get('href')
             egg_group = EggGroup(name, link)
             self.register_egg_group(egg_group)
@@ -35,3 +31,9 @@ class Pokedex(object):
         key = slugify(egg_group.name)
         self.egg_groups[key] = egg_group
         egg_group.pokedex = self
+
+    def parse_egg_groups(self, specifics=None):
+        groups = specifics or self.egg_groups
+        for group in groups:
+            group = self.egg_groups[group]
+            group.parse()
