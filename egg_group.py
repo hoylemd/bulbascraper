@@ -1,5 +1,3 @@
-from utils import slugify
-
 from parsable import Parsable
 from pokemon import Pokemon
 
@@ -18,10 +16,10 @@ class EggGroup(Parsable):
         pokemon_tables = soup.select('table.roundy table')
 
         for pokemon_row in pokemon_tables[0].select('tr')[1:]:
+            # TODO fix this
             link = pokemon_row.select('td:nth-of-type(3) a')[0]
-            pokemon = Pokemon(link)
-            pokemon.egg_groups.append(self)
-            self.pokemon[slugify(pokemon.name)] = pokemon
+            pokemon = Pokemon(link, egg_group=self)
+            self.pokemon[pokemon.slug] = pokemon
 
     def parse_pokemon(self, specifics=None):
         mons = specifics or self.pokemon

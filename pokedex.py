@@ -1,6 +1,9 @@
-from utils import slugify
-
 from egg_group import EggGroup
+
+
+class DuplicateEggGroupException(BaseException):
+    def __init__(self, egg_group):
+        self.message = "Egg group '{}' already instantiated."
 
 
 class Pokedex(object):
@@ -13,20 +16,31 @@ class Pokedex(object):
         self.pokemon = {}
         self.egg_groups = {}
 
-    def get_egg_groups(self):
-        soup = self.source.get_egg_groups()
+    def get_egg_groups(self, links=None):
+        returned_groups = {}
 
-        egg_group_links = soup.table.find_all('a')
+        if links is None:
+            soup = self.source.get_egg_groups()
+            links = soup.table.find_all('a')
+            returned_groups = None  # means we'll return the whole set
 
-        for link in egg_group_links:
+        for link in links:
             egg_group = EggGroup(link)
-            self.register_egg_group(egg_group)
+            try:
+                self.register_egg_group(egg_group)
+                if returned_groups is not None:
+                    returned_groups[egg_group.slug] = egg_group
+            except DuplicateEggGroupException as sadness:
+                print sadness
 
-        return self.egg_groups
+        return returned_groups if returned_groups is None else self.egg_groups
 
     def register_egg_group(self, egg_group):
-        key = slugify(egg_group.name)
-        self.egg_groups[key] = egg_group
+        if egg_group.slug in self.egg_groups:
+            raise Exception("Egg group '{}' already registered!"
+                            .format(egg_group.name))
+
+        self.egg_groups[egg_group.slug] = egg_group
         egg_group.pokedex = self
 
     def parse_egg_groups(self, specifics=None):

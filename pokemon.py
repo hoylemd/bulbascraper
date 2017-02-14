@@ -2,7 +2,9 @@ from parsable import Parsable
 
 
 class Pokemon(Parsable):
-    def __init__(self, name, path=None):
+    pokedex = None
+
+    def __init__(self, name, path=None, egg_group=None):
         super(Pokemon, self).__init__(name, path)
 
         self.pokedex = None
@@ -22,23 +24,24 @@ class Pokemon(Parsable):
         self.links_section = None
 
         # breeding info
-        self.egg_groups = []
-        self.hatch_time_min = 0
-        self.hatch_time_max = 0
+        self.egg_groups = None
+        self.hatch_time_min = None
+        self.hatch_time_max = None
+        self.gender_ratio = None
 
-        self.gender_ratio = 0.5
+        if egg_group is not None:
+            self.egg_groups = {egg_group.slug: egg_group}
 
     def parse_egg_groups(self, cell):
         if cell.span.string != u'Egg Group':
-            raise Exception("failed to parse Egg Group from {}'s page. "
+            raise Exception("Failed to parse Egg Group from {}'s page. "
                             "Expected u'Egg Group', received '{}'"
                             .format(self.name, cell.span.string))
 
         links = cell.table.find_all('a')
-        for link in links:
-            name = link.string
-            path = link['href']
-            print u"{}: {}".format(name, path)
+
+        # verify that the egg groups exist
+        self.egg_groups = self.pokedex.get_egg_groups(links)
 
     def parse_hatch_time(self, cell):
         pass
