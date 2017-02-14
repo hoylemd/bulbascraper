@@ -1,3 +1,5 @@
+from utils import slugify
+
 from bs4.element import Tag
 
 
@@ -19,6 +21,8 @@ class Parsable(object):
 
         self.name = name
         self.path = path
+
+        self.slug = slugify(name)
 
     def parse(self):
         if self.source is None:
