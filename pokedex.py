@@ -16,13 +16,13 @@ class Pokedex(object):
     def get_egg_groups(self):
         soup = self.source.get_egg_groups()
 
-        egg_group_links = soup.select('table')[0].select('a')
+        egg_group_links = soup.table.find_all('a')
 
         for link in egg_group_links:
-            name = link.select('span')[0].string
+            name = link.string
+            path = link['href']
 
-            link = link.get('href')
-            egg_group = EggGroup(name, link)
+            egg_group = EggGroup(name, path)
             self.register_egg_group(egg_group)
 
         return self.egg_groups
