@@ -15,8 +15,13 @@ class Parsable(object):
         self.name = name
         self.path = path
 
+        self._soup = None
+
     def parse(self):
-        return get_from_bulbapedia(self.path)
+        if self._soup is None:
+            self._soup = get_from_bulbapedia(self.path)
+
+        return self._soup
 
     def __unicode__(self):
         return u"{}: {}".format(self.name, self.path)
@@ -30,6 +35,13 @@ class Pokemon(Parsable):
         self.gender_ratio = 0.5
         self.hatch_time_min = 0
         self.hatch_time_max = 0
+
+    def parse(self):
+        soup = super(Pokemon, self).parse()
+
+        content = soup.find(id='mw-content-text')
+        sidebar = content.find_all('table', recursive=False)[1]
+        import ipdb; ipdb.set_trace()
 
 
 class EggGroup(Parsable):
@@ -50,7 +62,11 @@ class EggGroup(Parsable):
             pokemon = Pokemon(name, path)
             pokemon.egg_groups.append(self)
             self.pokemon[name] = pokemon
-            print u"{}".format(pokemon)
+
+    def parse_pokemon(self):
+        for mon in self.pokemon:
+            pokemon = self.pokemon[mon]
+            pokemon.parse()
 
 
 def get_egg_groups(url):
@@ -76,3 +92,5 @@ if __name__ == '__main__':
     for name in egg_groups:
         group = egg_groups[name]
         group.parse()
+
+    egg_groups[u'Bug'].parse_pokemon()
