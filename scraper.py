@@ -45,16 +45,35 @@ class Pokemon(Parsable):
         self.colour_and_friendship_section = None
         self.links_section = None
 
+        # breeding info
         self.egg_groups = []
-        self.gender_ratio = 0.5
         self.hatch_time_min = 0
         self.hatch_time_max = 0
+
+        self.gender_ratio = 0.5
+
+    def parse_egg_groups(self, cell):
+        if cell.span.string != u'Egg Group':
+            raise Exception("failed to parse Egg Group from {}'s page. "
+                            "Expected u'Egg Group', received '{}'"
+                            .format(self.name, cell.span.string))
+
+        links = cell.table.find_all('a')
+        for link in links:
+            name = link.string
+            path = link['href']
+            print u"{}: {}".format(name, path)
+
+    def parse_hatch_time(self, cell):
+        pass
 
     def parse_breeding(self):
         cells = self.breeding_section.table.tr.find_all('td', recursive=False)
         egg_group_cell = cells[0]
         hatch_time_cell = cells[1]
-        import ipdb; ipdb.set_trace()
+
+        self.parse_egg_groups(egg_group_cell)
+        self.parse_hatch_time(hatch_time_cell)
 
     def parse(self):
         soup = super(Pokemon, self).parse()
@@ -64,18 +83,27 @@ class Pokemon(Parsable):
         sections = sidebar.find_all('tr', recursive=False)
 
         self.header_section = sections[0]
-        self.type_section = sections[1]
-        self.ability_section = sections[2]
-        self.gender_catch_section = sections[3]
-        self.breeding_section = sections[4]
-        self.physiology_section = sections[5]
-        self.mega_section = sections[6]
-        self.pokedex_section = sections[7]
-        self.exp_section = sections[8]
-        self.ev_yield_section = sections[9]
-        self.appearance_section = sections[10]
-        self.colour_and_friendship_section = sections[11]
-        self.links_section = sections[12]
+
+        if len(sections) == 13:
+            self.type_section = sections[1]
+            self.ability_section = sections[2]
+            offset_sections = sections[3:]
+        else:
+            cells = sections[1].find_all('td', recursive=False)
+            self.type_section = cells[0]
+            self.ability_section = cells[1]
+            offset_sections = sections[2:]
+
+        self.gender_catch_section = offset_sections[0]
+        self.breeding_section = offset_sections[1]
+        self.physiology_section = offset_sections[3]
+        self.mega_section = offset_sections[3]
+        self.pokedex_section = offset_sections[4]
+        self.exp_section = offset_sections[5]
+        self.ev_yield_section = offset_sections[6]
+        self.appearance_section = offset_sections[7]
+        self.colour_and_friendship_section = offset_sections[8]
+        self.links_section = offset_sections[9]
 
         self.parse_breeding()
 
@@ -94,7 +122,7 @@ class EggGroup(Parsable):
         for pokemon_row in pokemon_tables[0].select('tr')[1:]:
             link = pokemon_row.select('td:nth-of-type(3) a')[0]
             name = link.string
-            path = link.get('href')
+            path = link['href']
             pokemon = Pokemon(name, path)
             pokemon.egg_groups.append(self)
             self.pokemon[name] = pokemon
