@@ -8,6 +8,7 @@ BULBAPEDIA_EGG_GROUPS_PATH = '/wiki/Egg_Group'
 class Bulbapedia(object):
     def __init__(self, domain=BULBAPEDIA_DOMAIN):
         self.domain = domain
+        # IDEA: have a local cache of the pages
         self.pages = {}
 
     def get(self, path):
