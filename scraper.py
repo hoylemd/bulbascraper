@@ -1,6 +1,6 @@
 from utils import slugify
 from bulbapedia import Bulbapedia
-
+from parsable import Parsable
 
 bulbapedia = None
 
@@ -37,23 +37,6 @@ class Pokedex(object):
         key = slugify(egg_group.name)
         self.egg_groups[key] = egg_group
         egg_group.pokedex = self
-
-
-class Parsable(object):
-    def __init__(self, name, path):
-        self.name = name
-        self.path = path
-
-        self._soup = None
-
-    def parse(self):
-        if self._soup is None:
-            self._soup = bulbapedia.get(self.path)
-
-        return self._soup
-
-    def __unicode__(self):
-        return u"{}: {}".format(self.name, self.path)
 
 
 class Pokemon(Parsable):
@@ -172,6 +155,8 @@ class EggGroup(Parsable):
 
 if __name__ == '__main__':
     bulbapedia = Bulbapedia()
+
+    Parsable.source = bulbapedia
 
     pokedex = Pokedex(source=bulbapedia)
 
