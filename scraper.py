@@ -1,4 +1,5 @@
-from utils import slugify, Bulbapedia
+from utils import slugify
+from bulbapedia import Bulbapedia
 
 BULBAPEDIA_EGG_GROUPS_PATH = '/wiki/Egg_Group'
 
@@ -170,10 +171,8 @@ class EggGroup(Parsable):
             pokemon.parse()
 
 
-BULBAPEDIA_DOMAIN = 'http://bulbapedia.bulbagarden.net'
-
 if __name__ == '__main__':
-    bulbapedia = Bulbapedia(BULBAPEDIA_DOMAIN)
+    bulbapedia = Bulbapedia()
 
     pokedex = Pokedex(source=bulbapedia)
 
