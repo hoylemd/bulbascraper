@@ -1,7 +1,6 @@
 from utils import slugify
 from bulbapedia import Bulbapedia
 
-BULBAPEDIA_EGG_GROUPS_PATH = '/wiki/Egg_Group'
 
 bulbapedia = None
 
@@ -17,7 +16,7 @@ class Pokedex(object):
         self.egg_groups = {}
 
     def get_egg_groups(self):
-        soup = self.source.get(BULBAPEDIA_EGG_GROUPS_PATH)
+        soup = self.source.get_egg_groups()
 
         egg_group_links = soup.select('table')[0].select('a')
 

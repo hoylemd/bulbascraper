@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 BULBAPEDIA_DOMAIN = 'http://bulbapedia.bulbagarden.net'
+BULBAPEDIA_EGG_GROUPS_PATH = '/wiki/Egg_Group'
 
 
 class Bulbapedia(object):
@@ -23,3 +24,6 @@ class Bulbapedia(object):
             self.pages[path] = page
 
         return BeautifulSoup(page, 'html.parser')
+
+    def get_egg_groups(self):
+        return self.get(BULBAPEDIA_EGG_GROUPS_PATH)
