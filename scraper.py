@@ -1,13 +1,49 @@
 import requests
 from bs4 import BeautifulSoup
 
-BULBAPEDIA_DOMAIN = 'http://bulbapedia.bulbagarden.net'
+
+def slugify(name):
+    return name.lower()
 
 
 def get_from_bulbapedia(path):
     print 'scraping [{}]'.format(path)
     page = requests.get(BULBAPEDIA_DOMAIN + path).content
     return BeautifulSoup(page, 'html.parser')
+
+
+BULBAPEDIA_EGG_GROUPS_PATH = '/wiki/Egg_Group'
+
+
+class Pokedex(object):
+    def __init__(self, domain):
+        self.domain = domain
+
+        self.pokemon = {}
+        self.egg_groups = {}
+
+    def get_egg_groups(self):
+        soup = get_from_bulbapedia(BULBAPEDIA_EGG_GROUPS_PATH)
+
+        egg_group_links = soup.select('table')[0].select('a')
+
+        for link in egg_group_links:
+            name = link.select('span')[0].string
+
+            # TODO: remove this
+            if not name == u'Bug':
+                continue
+
+            link = link.get('href')
+            egg_group = EggGroup(name, link)
+            self.register_egg_group(egg_group)
+
+        return self.egg_groups
+
+    def register_egg_group(self, egg_group):
+        key = slugify(egg_group.name)
+        self.egg_groups[key] = egg_group
+        egg_group.pokedex = self
 
 
 class Parsable(object):
@@ -30,6 +66,8 @@ class Parsable(object):
 class Pokemon(Parsable):
     def __init__(self, name, path):
         super(Pokemon, self).__init__(name, path)
+
+        self.pokedex = None
 
         self.header_section = None
         self.type_section = None
@@ -114,6 +152,8 @@ class EggGroup(Parsable):
     def __init__(self, name, path):
         super(EggGroup, self).__init__(name, path)
 
+        self.pokedex = None
+
         self.pokemon = {}
 
     def parse(self):
@@ -135,33 +175,14 @@ class EggGroup(Parsable):
             pokemon.parse()
 
 
-def get_egg_groups(url):
-    egg_groups = {}
-
-    soup = get_from_bulbapedia(url)
-
-    egg_group_links = soup.select('table')[0].select('a')
-
-    for link in egg_group_links:
-        name = link.select('span')[0].string
-
-        # TODO: remove this
-        if not name == u'Bug':
-            continue
-
-        link = link.get('href')
-        egg_group = EggGroup(name, link)
-        egg_groups[name] = egg_group
-
-    return egg_groups
-
-
-BULBAPEDIA_EGG_GROUPS_URL = '/wiki/Egg_Group'
+BULBAPEDIA_DOMAIN = 'http://bulbapedia.bulbagarden.net'
 
 if __name__ == '__main__':
-    egg_groups = get_egg_groups(BULBAPEDIA_EGG_GROUPS_URL)
+    pokedex = Pokedex(BULBAPEDIA_DOMAIN)
+
+    egg_groups = pokedex.get_egg_groups()
     for name in egg_groups:
         group = egg_groups[name]
         group.parse()
 
-    egg_groups[u'Bug'].parse_pokemon()
+    egg_groups[u'bug'].parse_pokemon()
