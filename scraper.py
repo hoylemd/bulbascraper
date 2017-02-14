@@ -84,10 +84,12 @@ class Pokemon(Parsable):
 
         self.header_section = sections[0]
 
+        # pokemon with separate ability and type sections
         if len(sections) == 13:
             self.type_section = sections[1]
             self.ability_section = sections[2]
             offset_sections = sections[3:]
+        # pokemon with combined ability and type sections
         else:
             cells = sections[1].find_all('td', recursive=False)
             self.type_section = cells[0]
