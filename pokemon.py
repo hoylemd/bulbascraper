@@ -7,8 +7,6 @@ class Pokemon(Parsable):
     def __init__(self, name, path=None, egg_group=None):
         super(Pokemon, self).__init__(name, path)
 
-        self.pokedex = None
-
         self.header_section = None
         self.type_section = None
         self.ability_section = None

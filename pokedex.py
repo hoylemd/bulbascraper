@@ -3,7 +3,16 @@ from egg_group import EggGroup
 
 class DuplicateEggGroupException(BaseException):
     def __init__(self, egg_group):
-        self.message = "Egg group '{}' already instantiated."
+        self.egg_group = egg_group
+
+        self.message = (u"Egg group '{}' already instantiated."
+                        .format(egg_group.name))
+
+    def __unicode__(self):
+        return self.message
+
+    def __str__(self):
+        return self.message
 
 
 class Pokedex(object):
@@ -37,8 +46,7 @@ class Pokedex(object):
 
     def register_egg_group(self, egg_group):
         if egg_group.slug in self.egg_groups:
-            raise Exception("Egg group '{}' already registered!"
-                            .format(egg_group.name))
+            raise DuplicateEggGroupException(egg_group)
 
         self.egg_groups[egg_group.slug] = egg_group
         egg_group.pokedex = self
