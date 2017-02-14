@@ -39,7 +39,9 @@ class Pokemon(Parsable):
         links = cell.table.find_all('a')
 
         # verify that the egg groups exist
-        self.egg_groups = self.pokedex.get_egg_groups(links)
+        self.egg_groups = self.pokedex.discover_egg_groups(links)
+
+        return self.egg_groups
 
     def parse_hatch_time(self, cell):
         pass
@@ -53,7 +55,7 @@ class Pokemon(Parsable):
         self.parse_hatch_time(hatch_time_cell)
 
     def parse(self):
-        soup = super(Pokemon, self).parse()
+        soup = super(Pokemon, self).parse(complete=False)
 
         content = soup.find(id='mw-content-text')
         sidebar = content.find_all('table', recursive=False)[1]
@@ -85,3 +87,5 @@ class Pokemon(Parsable):
         self.links_section = offset_sections[9]
 
         self.parse_breeding()
+
+        self.parsed = True

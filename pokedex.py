@@ -25,7 +25,7 @@ class Pokedex(object):
         self.pokemon = {}
         self.egg_groups = {}
 
-    def get_egg_groups(self, links=None):
+    def discover_egg_groups(self, links=None):
         returned_groups = {}
 
         if links is None:

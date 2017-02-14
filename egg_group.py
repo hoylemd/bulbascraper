@@ -6,12 +6,10 @@ class EggGroup(Parsable):
     def __init__(self, name, path=None):
         super(EggGroup, self).__init__(name, path)
 
-        self.pokedex = None
-
         self.pokemon = {}
 
     def parse(self):
-        soup = super(EggGroup, self).parse()
+        soup = super(EggGroup, self).parse(complete=False)
 
         pokemon_tables = soup.select('table.roundy table')
 
@@ -20,6 +18,8 @@ class EggGroup(Parsable):
             link = pokemon_row.select('td:nth-of-type(3) a')[0]
             pokemon = Pokemon(link, egg_group=self)
             self.pokemon[pokemon.slug] = pokemon
+
+        self.parsed = True
 
     def parse_pokemon(self, specifics=None):
         mons = specifics or self.pokemon

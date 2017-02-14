@@ -1,13 +1,11 @@
-from utils import slugify
-
-from bs4.element import Tag
+from utils import slugify, is_link
 
 
 class Parsable(object):
     source = None
 
     def __init__(self, name_or_anchor, path=None):
-        if isinstance(name_or_anchor, Tag) and name_or_anchor.name == 'a':
+        if is_link(name_or_anchor):
             name = name_or_anchor.string
             path = name_or_anchor['href']
         elif isinstance(name_or_anchor, basestring):
@@ -24,9 +22,14 @@ class Parsable(object):
 
         self.slug = slugify(name)
 
-    def parse(self):
+        self.parsed = False
+
+    def parse(self, complete=True):
         if self.source is None:
-            raise Exception('Parsable cannot parse without a source or soup!')
+            raise Exception('Parsable cannot parse without a source!')
+
+        if complete:
+            self.parsed = True
 
         return self.source.get(self.path)
 
