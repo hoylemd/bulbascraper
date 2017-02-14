@@ -1,29 +1,22 @@
-import requests
-from bs4 import BeautifulSoup
-
-
-def slugify(name):
-    return name.lower()
-
-
-def get_from_bulbapedia(path):
-    print 'scraping [{}]'.format(path)
-    page = requests.get(BULBAPEDIA_DOMAIN + path).content
-    return BeautifulSoup(page, 'html.parser')
-
+from utils import slugify, Bulbapedia
 
 BULBAPEDIA_EGG_GROUPS_PATH = '/wiki/Egg_Group'
 
+bulbapedia = None
+
 
 class Pokedex(object):
-    def __init__(self, domain):
-        self.domain = domain
+    def __init__(self, source=None):
+        self.source = source or bulbapedia
+
+        if self.source is None:
+            raise Exception('Bulbapedia neither passed nor set globally.')
 
         self.pokemon = {}
         self.egg_groups = {}
 
     def get_egg_groups(self):
-        soup = get_from_bulbapedia(BULBAPEDIA_EGG_GROUPS_PATH)
+        soup = self.source.get(BULBAPEDIA_EGG_GROUPS_PATH)
 
         egg_group_links = soup.select('table')[0].select('a')
 
@@ -55,7 +48,7 @@ class Parsable(object):
 
     def parse(self):
         if self._soup is None:
-            self._soup = get_from_bulbapedia(self.path)
+            self._soup = bulbapedia.get(self.path)
 
         return self._soup
 
@@ -167,10 +160,12 @@ class EggGroup(Parsable):
             path = link['href']
             pokemon = Pokemon(name, path)
             pokemon.egg_groups.append(self)
-            self.pokemon[name] = pokemon
+            self.pokemon[slugify(name)] = pokemon
 
     def parse_pokemon(self):
-        for mon in self.pokemon:
+        # for mon in self.pokemon:
+        mons = ['nincada', 'metapod']
+        for mon in mons:
             pokemon = self.pokemon[mon]
             pokemon.parse()
 
@@ -178,7 +173,9 @@ class EggGroup(Parsable):
 BULBAPEDIA_DOMAIN = 'http://bulbapedia.bulbagarden.net'
 
 if __name__ == '__main__':
-    pokedex = Pokedex(BULBAPEDIA_DOMAIN)
+    bulbapedia = Bulbapedia(BULBAPEDIA_DOMAIN)
+
+    pokedex = Pokedex(source=bulbapedia)
 
     egg_groups = pokedex.get_egg_groups()
     for name in egg_groups:
