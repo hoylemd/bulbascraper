@@ -19,10 +19,7 @@ class Pokedex(object):
         egg_group_links = soup.table.find_all('a')
 
         for link in egg_group_links:
-            name = link.string
-            path = link['href']
-
-            egg_group = EggGroup(name, path)
+            egg_group = EggGroup(link)
             self.register_egg_group(egg_group)
 
         return self.egg_groups

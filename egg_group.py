@@ -5,7 +5,7 @@ from pokemon import Pokemon
 
 
 class EggGroup(Parsable):
-    def __init__(self, name, path):
+    def __init__(self, name, path=None):
         super(EggGroup, self).__init__(name, path)
 
         self.pokedex = None
@@ -19,11 +19,9 @@ class EggGroup(Parsable):
 
         for pokemon_row in pokemon_tables[0].select('tr')[1:]:
             link = pokemon_row.select('td:nth-of-type(3) a')[0]
-            name = link.string
-            path = link['href']
-            pokemon = Pokemon(name, path)
+            pokemon = Pokemon(link)
             pokemon.egg_groups.append(self)
-            self.pokemon[slugify(name)] = pokemon
+            self.pokemon[slugify(pokemon.name)] = pokemon
 
     def parse_pokemon(self, specifics=None):
         mons = specifics or self.pokemon

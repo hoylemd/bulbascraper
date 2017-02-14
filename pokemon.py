@@ -2,7 +2,7 @@ from parsable import Parsable
 
 
 class Pokemon(Parsable):
-    def __init__(self, name, path):
+    def __init__(self, name, path=None):
         super(Pokemon, self).__init__(name, path)
 
         self.pokedex = None
