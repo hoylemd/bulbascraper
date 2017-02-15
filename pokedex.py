@@ -24,7 +24,7 @@ class Pokedex(object):
         if self.source is None:
             raise TypeError('Pokedex() expects a source kwarg')
 
-        self.pokemons = {}
+        self.pokemon = {}
         self.egg_groups = {}
 
     def discover_egg_group(self, clue):
@@ -70,17 +70,17 @@ class Pokedex(object):
         elif isinstance(clue, Pokemon):
             pokemon = clue
         elif isinstance(clue, basestring):
-            pokemon = self.pokemons[clue]
+            pokemon = self.pokemon[clue]
         else:
             raise TypeError('invalid clue passed to `discover_pokemon`: '
                             '{}'.format(clue))
 
-        if pokemon.slug not in self.pokemons:
-            self.pokemons[pokemon.slug] = pokemon
+        if pokemon.slug not in self.pokemon:
+            self.pokemon[pokemon.slug] = pokemon
 
-        return self.pokemons[pokemon.slug]
+        return self.pokemon[pokemon.slug]
 
-    def discover_pokemonss(self, clues=None):
+    def discover_pokemons(self, clues=None):
         returned_pokemons = {}
 
         if clues is None:

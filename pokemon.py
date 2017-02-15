@@ -4,7 +4,7 @@ from parsable import Parsable
 class Pokemon(Parsable):
     pokedex = None
 
-    def __init__(self, name, path=None, egg_group=None):
+    def __init__(self, name, path=None):
         super(Pokemon, self).__init__(name, path)
 
         self.header_section = None
@@ -26,9 +26,6 @@ class Pokemon(Parsable):
         self.hatch_time_min = None
         self.hatch_time_max = None
         self.gender_ratio = None
-
-        if egg_group is not None:
-            self.egg_groups = {egg_group.slug: egg_group}
 
     def parse_egg_groups(self, cell):
         if cell.span.string != u'Egg Group':
@@ -89,3 +86,11 @@ class Pokemon(Parsable):
         self.parse_breeding()
 
         self.parsed = True
+
+    @property
+    def egg_groups_string(self):
+        return u', '.join(group.name for _, group in self.egg_groups.items())
+
+    @property
+    def breeding_summary(self):
+        return u"{} ({})".format(self.name, self.egg_groups_string)

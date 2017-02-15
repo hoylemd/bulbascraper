@@ -21,7 +21,7 @@ class EggGroup(Parsable):
         rows += this_and_other_group.table.find_all('tr')[1:]
         for pokemon_row in rows:
             link = pokemon_row.find_all('td', recursive=False)[2].a
-            pokemon = Pokemon(link, egg_group=self)
+            pokemon = self.pokedex.discover_pokemon(link)
             self.pokemon[pokemon.slug] = pokemon
 
         self.parsed = True
