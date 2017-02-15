@@ -1,5 +1,8 @@
 from parsable import Parsable
 
+EGG_CYCLE_STEPS = 257
+HATCH_TIME_SPLITTER = u'\xa0-\xa0'
+
 
 class Pokemon(Parsable):
     pokedex = None
@@ -46,8 +49,8 @@ class Pokemon(Parsable):
                             .format(self.name, cell.span.string))
 
         range_definition = unicode(cell.table.td.contents[0]).strip()
-        floor, _ = range_definition.split(u'\xa0-\xa0')
-        self.egg_cycles = int(floor) / 257
+        floor, _ = range_definition.split(HATCH_TIME_SPLITTER)
+        self.egg_cycles = int(floor) / EGG_CYCLE_STEPS
 
     def parse_breeding(self):
         cells = self.breeding_section.table.tr.find_all('td', recursive=False)
@@ -98,5 +101,13 @@ class Pokemon(Parsable):
         return u', '.join(group.name for _, group in self.egg_groups.items())
 
     @property
+    def hatch_string(self):
+        min_steps = self.egg_cycles * EGG_CYCLE_STEPS
+        max_steps = min_steps + EGG_CYCLE_STEPS - 1
+        return (u'{} egg cycles ({} to {} steps)'
+                .format(self.egg_cycles, min_steps, max_steps))
+
+    @property
     def breeding_summary(self):
-        return u"{} ({})".format(self.name, self.egg_groups_string)
+        return (u"{} ({}) {}"
+                .format(self.name, self.egg_groups_string, self.hatch_string))
