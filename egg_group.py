@@ -1,5 +1,4 @@
 from parsable import Parsable
-from pokemon import Pokemon
 
 
 class EggGroup(Parsable):

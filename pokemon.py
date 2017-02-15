@@ -23,14 +23,13 @@ class Pokemon(Parsable):
 
         # breeding info
         self.egg_groups = None
-        self.hatch_time_min = None
-        self.hatch_time_max = None
+        self.egg_cycles = None
         self.gender_ratio = None
 
     def parse_egg_groups(self, cell):
         if cell.span.string != u'Egg Group':
             raise Exception("Failed to parse Egg Group from {}'s page. "
-                            "Expected u'Egg Group', received '{}'"
+                            "Expected u'Egg Group', found '{}'"
                             .format(self.name, cell.span.string))
 
         links = cell.table.find_all('a')
@@ -40,16 +39,23 @@ class Pokemon(Parsable):
 
         return self.egg_groups
 
-    def parse_hatch_time(self, cell):
-        pass
+    def parse_egg_cycles(self, cell):
+        if cell.span.string != u'Hatch time':
+            raise Exception("Failed to parse Hatch Time from {}'s page.'"
+                            "Expected u'Hatch time', found '{}'"
+                            .format(self.name, cell.span.string))
+
+        range_definition = unicode(cell.table.td.contents[0]).strip()
+        floor, _ = range_definition.split(u'\xa0-\xa0')
+        self.egg_cycles = int(floor) / 257
 
     def parse_breeding(self):
         cells = self.breeding_section.table.tr.find_all('td', recursive=False)
         egg_group_cell = cells[0]
-        hatch_time_cell = cells[1]
+        egg_cycles_cell = cells[1]
 
         self.parse_egg_groups(egg_group_cell)
-        self.parse_hatch_time(hatch_time_cell)
+        self.parse_egg_cycles(egg_cycles_cell)
 
     def parse(self):
         soup = super(Pokemon, self).parse(complete=False)
