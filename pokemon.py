@@ -1,5 +1,7 @@
 from parsable import Parsable
 
+EGG_GROUP_HEADINGS = [u'Egg Group', u'Egg Groups']
+
 EGG_CYCLE_STEPS = 257
 HATCH_TIME_SPLITTER = u'\xa0-\xa0'
 
@@ -30,7 +32,7 @@ class Pokemon(Parsable):
         self.gender_ratio = None
 
     def parse_egg_groups(self, cell):
-        if cell.span.string != u'Egg Group':
+        if cell.span.string not in EGG_GROUP_HEADINGS:
             raise Exception("Failed to parse Egg Group from {}'s page. "
                             "Expected u'Egg Group', found '{}'"
                             .format(self.name, cell.span.string))

@@ -18,6 +18,7 @@ if __name__ == '__main__':
     pokedex.discover_egg_groups()
     pokedex.parse_egg_groups(specifics=['bug'])
 
-    pokedex.egg_groups[u'bug'].parse_pokemon(specifics=['nincada', 'metapod'])
-    print pokedex.pokemon['nincada'].breeding_summary
-    print pokedex.pokemon['metapod'].breeding_summary
+    pokedex.egg_groups[u'bug'].parse_pokemon()
+    print 'Bug group breeding details!'
+    for slug in pokedex.pokemon:
+        print pokedex.pokemon[slug].breeding_summary
