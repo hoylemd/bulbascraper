@@ -1,8 +1,9 @@
+from slugify import slugify as _slugify
 from bs4.element import Tag
 
 
 def slugify(name):
-    return name.lower()
+    return _slugify(unicode(name))
 
 
 def is_link(obj):
