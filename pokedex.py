@@ -1,3 +1,4 @@
+from utils import is_link
 from egg_group import EggGroup
 
 
@@ -25,31 +26,41 @@ class Pokedex(object):
         self.pokemon = {}
         self.egg_groups = {}
 
+    def discover_egg_group(self, clue):
+        """
+            Clue can be an <a> tag, slug, or instance
+            returns EggGroup object or None if it can't be found
+        """
+        if is_link(clue):
+            egg_group = EggGroup(clue)
+        elif isinstance(clue, EggGroup):
+            egg_group = clue
+        elif isinstance(clue, basestring):
+            egg_group = self.egg_groups[clue]
+        else:
+            raise TypeError('invalid clue passed to `discover_egg_group`: '
+                            '{}'.format(clue))
+
+        if egg_group.slug not in self.egg_groups:
+            self.egg_groups[egg_group.slug] = egg_group
+
+        return self.egg_groups[egg_group.slug]
+
     def discover_egg_groups(self, links=None):
+        """load all egg groups from source, or if links is provided, return
+           a dict of lazy EggGroup objects correspinding to those links"""
+
         returned_groups = {}
 
         if links is None:
             soup = self.source.get_egg_groups()
             links = soup.table.find_all('a')
-            returned_groups = None  # means we'll return the whole set
 
         for link in links:
-            egg_group = EggGroup(link)
-            try:
-                self.register_egg_group(egg_group)
-                if returned_groups is not None:
-                    returned_groups[egg_group.slug] = egg_group
-            except DuplicateEggGroupException as sadness:
-                print sadness
+            group = self.discover_egg_group(link)
+            returned_groups[group.slug] = group
 
-        return returned_groups if returned_groups is None else self.egg_groups
-
-    def register_egg_group(self, egg_group):
-        if egg_group.slug in self.egg_groups:
-            raise DuplicateEggGroupException(egg_group)
-
-        self.egg_groups[egg_group.slug] = egg_group
-        egg_group.pokedex = self
+        return returned_groups
 
     def parse_egg_groups(self, specifics=None):
         groups = specifics or self.egg_groups
