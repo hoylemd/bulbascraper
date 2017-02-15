@@ -46,18 +46,15 @@ class Pokedex(object):
 
         return self.egg_groups[egg_group.slug]
 
-    def discover_egg_groups(self, links=None):
-        """load all egg groups from source, or if links is provided, return
-           a dict of lazy EggGroup objects correspinding to those links"""
-
+    def discover_egg_groups(self, clues=None):
         returned_groups = {}
 
-        if links is None:
+        if clues is None:
             soup = self.source.get_egg_groups()
-            links = soup.table.find_all('a')
+            clues = soup.table.find_all('a')
 
-        for link in links:
-            group = self.discover_egg_group(link)
+        for clue in clues:
+            group = self.discover_egg_group(clue)
             returned_groups[group.slug] = group
 
         return returned_groups
