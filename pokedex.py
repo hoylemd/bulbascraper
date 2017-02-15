@@ -1,5 +1,6 @@
 from utils import is_link
 from egg_group import EggGroup
+from pokemon import Pokemon
 
 
 class DuplicateEggGroupException(BaseException):
@@ -23,7 +24,7 @@ class Pokedex(object):
         if self.source is None:
             raise TypeError('Pokedex() expects a source kwarg')
 
-        self.pokemon = {}
+        self.pokemons = {}
         self.egg_groups = {}
 
     def discover_egg_group(self, clue):
@@ -58,6 +59,38 @@ class Pokedex(object):
             returned_groups[group.slug] = group
 
         return returned_groups
+
+    def discover_pokemon(self, clue):
+        """
+            Clue can be an <a> tag, slug, or instance
+            returns Pokemon object or None if it can't be found
+        """
+        if is_link(clue):
+            pokemon = Pokemon(clue)
+        elif isinstance(clue, Pokemon):
+            pokemon = clue
+        elif isinstance(clue, basestring):
+            pokemon = self.pokemons[clue]
+        else:
+            raise TypeError('invalid clue passed to `discover_pokemon`: '
+                            '{}'.format(clue))
+
+        if pokemon.slug not in self.pokemons:
+            self.pokemons[pokemon.slug] = pokemon
+
+        return self.pokemons[pokemon.slug]
+
+    def discover_pokemonss(self, clues=None):
+        returned_pokemons = {}
+
+        if clues is None:
+            raise Exception('Too many pokemon to discover them all.')
+
+        for clue in clues:
+            pokemon = self.discover_pokemon(clue)
+            returned_pokemons[pokemon.slug] = pokemon
+
+        return returned_pokemons
 
     def parse_egg_groups(self, specifics=None):
         groups = specifics or self.egg_groups
